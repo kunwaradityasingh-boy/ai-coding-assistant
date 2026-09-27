@@ -1,0 +1,10 @@
+[project]
+name = "ai-coding-assistant"
+version = "0.1.0"
+description = "AI Coding Assistant and Code Review Agent"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "--ignore=tests/integration"

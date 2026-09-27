@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta
+      name="description"
+      content="AI Coding Assistant - Beginner-friendly Python code review, learning, fixing and verification."
+    />
+
+    <title>AI Coding Assistant</title>
+
+    <!-- Main stylesheet -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+
+  <body>
+    <!-- =========================
+         HEADER
+    ========================== -->
+
+    <header>
+      <div class="header-content">
+        <div class="brand">
+          <div class="brand-icon">🤖</div>
+
+          <div>
+            <h1>AI Coding Assistant</h1>
+
+            <p>
+              Beginner-friendly Python code review, learning and debugging
+              assistant
+            </p>
+          </div>
+        </div>
+
+        <div class="status-badge">
+          <span class="status-dot"></span>
+
+          Python Analysis Ready
+        </div>
+      </div>
+    </header>
+
+    <!-- =========================
+         MAIN APPLICATION
+    ========================== -->
+
+    <main>
+      <!-- =========================
+             CODE EDITOR
+        ========================== -->
+
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">💻 Write Your Python Code</h2>
+
+            <p class="card-description">
+              Enter your Python code and let the assistant analyze, explain and
+              verify it.
+            </p>
+          </div>
+        </div>
+
+        <!-- Code editor -->
+
+        <div class="editor-wrapper">
+          <div class="editor-topbar">
+            <div class="editor-language">Python</div>
+
+            <div class="editor-dots">
+              <span class="editor-dot"></span>
+
+              <span class="editor-dot"></span>
+
+              <span class="editor-dot"></span>
+            </div>
+          </div>
+
+          <textarea
+            id="codeInput"
+            spellcheck="false"
+            aria-label="Python code editor"
+          >
+x = 10
+y = 0
+print(x / y)</textarea
+          >
+        </div>
+
+        <!-- Editor information -->
+
+        <div class="editor-footer">
+          <span> 💡 Tip: Start with a small piece of code while testing. </span>
+
+          <span id="lineCount"> Lines: 3 </span>
+        </div>
+
+        <!-- Buttons -->
+
+        <div class="button-row">
+          <button
+            id="analyzeButton"
+            class="primary-button"
+            type="button"
+            onclick="analyzeCode()"
+          >
+            🔍 Analyze Code
+          </button>
+
+          <button class="secondary-button" type="button" onclick="clearCode()">
+            🧹 Clear
+          </button>
+        </div>
+
+        <!-- Loading -->
+
+        <div id="loading" class="loading" role="status" aria-live="polite">
+          ⏳ Analyzing your code... Please wait.
+        </div>
+      </section>
+
+      <!-- =========================
+             RESULTS
+        ========================== -->
+
+      <section id="result" class="card result">
+        <!-- =========================
+                 CODE REVIEW
+            ========================== -->
+
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">📋 Code Review</h2>
+
+            <p class="card-description">
+              Technical findings from the analysis pipeline.
+            </p>
+          </div>
+        </div>
+
+        <!-- Review summary -->
+
+        <div class="summary-box">
+          <div class="summary-label">Review Summary</div>
+
+          <p id="summary"></p>
+        </div>
+
+        <!-- Issues -->
+
+        <div id="issues"></div>
+
+        <!-- Positive points -->
+
+        <h3>✅ Positive Points</h3>
+
+        <div id="positivePoints"></div>
+
+        <hr class="section-divider" />
+
+        <!-- =========================
+                 LEARNING / TUTOR
+            ========================== -->
+
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">📚 Learn From Your Code</h2>
+
+            <p class="card-description">
+              Understand the problem instead of simply copying a fix.
+            </p>
+          </div>
+        </div>
+
+        <div class="learning-box">
+          <!-- Concept -->
+
+          <span id="concept" class="concept"> Code Reasoning </span>
+
+          <!-- Explanation -->
+
+          <div class="learning-label">Explanation</div>
+
+          <p id="explanation" class="learning-text"></p>
+
+          <!-- Hints -->
+
+          <div class="learning-label">💡 Progressive Hints</div>
+
+          <div id="hints"></div>
+
+          <!-- Next step -->
+
+          <div class="learning-label">➡️ Next Step</div>
+
+          <p id="nextStep" class="learning-text"></p>
+        </div>
+
+        <hr class="section-divider" />
+
+        <!-- =========================
+                 FIXER
+            ========================== -->
+
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">🔧 Suggested Fix</h2>
+
+            <p class="card-description">
+              A local automatic fix is shown when a known safe fix exists.
+            </p>
+          </div>
+        </div>
+
+        <div id="fixSection"></div>
+
+        <hr class="section-divider" />
+
+        <!-- =========================
+                 VERIFICATION
+            ========================== -->
+
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">🛡️ Fix Verification</h2>
+
+            <p class="card-description">
+              Generated fixes are checked before being considered successful.
+            </p>
+          </div>
+        </div>
+
+        <div id="verificationSection"></div>
+      </section>
+    </main>
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+
+    <footer>
+      AI Coding Assistant • Python MVP • Review → Learn → Fix → Verify
+    </footer>
+
+    <!-- =========================
+         JAVASCRIPT
+    ========================== -->
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  </body>
+</html>
