@@ -6,6 +6,7 @@ from flask_cors import CORS
 from src.analysis.evidence_builder import build_code_evidence
 from src.fixer.local_fixer import LocalFixer
 from src.review.review_service import ReviewService
+from src.runtime.python_runner import run_python_code
 from src.tutor.local_tutor import LocalTutor
 from src.verification.verifier import Verifier
 
@@ -34,6 +35,70 @@ CORS(
 @app.get("/")
 def home():
     return "AI Coding Assistant is running!"
+
+
+@app.post("/run")
+def run_code():
+    data = request.get_json(silent=True)
+
+    if data is None:
+        return jsonify(
+            {
+                "success": False,
+                "error": "Invalid JSON request.",
+            }
+        ), 400
+
+    if not data or "code" not in data:
+        return jsonify(
+            {
+                "success": False,
+                "error": "Code is required.",
+            }
+        ), 400
+
+    code = data["code"]
+
+    if not isinstance(code, str):
+        return jsonify(
+            {
+                "success": False,
+                "error": "Code must be a string.",
+            }
+        ), 400
+
+    if not code.strip():
+        return jsonify(
+            {
+                "success": False,
+                "error": "Code cannot be empty.",
+            }
+        ), 400
+
+    try:
+        result = run_python_code(code)
+
+        return jsonify(
+            {
+                "success": result["success"],
+                "stdout": result["stdout"],
+                "stderr": result["stderr"],
+                "return_code": result["return_code"],
+                "timed_out": result["timed_out"],
+            }
+        )
+
+    except Exception:
+        app.logger.exception(
+            "Unexpected error while running code."
+        )
+
+        return jsonify(
+            {
+                "success": False,
+                "error": "Internal server error.",
+            }
+        ), 500
 
 
 @app.post("/analyze")

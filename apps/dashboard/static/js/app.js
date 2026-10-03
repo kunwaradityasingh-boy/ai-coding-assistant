@@ -1,4 +1,5 @@
 const API_URL = "http://127.0.0.1:5000/analyze";
+const RUN_API_URL = "http://127.0.0.1:5000/run";
 
 /*
  * DOM elements
@@ -9,8 +10,9 @@ const codeInput = document.getElementById("codeInput");
 const resultBox = document.getElementById("result");
 
 const loading = document.getElementById("loading");
-
 const analyzeButton = document.getElementById("analyzeButton");
+
+const runButton = document.getElementById("runButton");
 
 const summary = document.getElementById("summary");
 
@@ -436,6 +438,81 @@ async function analyzeCode() {
 }
 
 /*
+ * Run Python code
+ */
+
+async function runCode() {
+  const code = codeInput.value;
+
+  const consoleOutput = document.getElementById("consoleOutput");
+  const consoleStatus = document.getElementById("consoleStatus");
+
+  if (!code.trim()) {
+    consoleStatus.textContent = "Error";
+    consoleOutput.innerHTML =
+      '<div class="console-error">Please enter Python code.</div>';
+    return;
+  }
+
+  runButton.disabled = true;
+  runButton.textContent = "⏳ Running...";
+
+  consoleStatus.textContent = "Running";
+  consoleOutput.innerHTML =
+    '<div class="console-info">Executing Python code...</div>';
+
+  try {
+    const response = await fetch(RUN_API_URL, {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify({
+        code: code,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Code execution failed.");
+    }
+
+    if (data.success) {
+      consoleStatus.textContent = "Success";
+
+      const output = data.stdout || "Code executed successfully.";
+
+      consoleOutput.innerHTML = `<div class="console-success">${escapeHtml(output)}</div>`;
+    } else if (data.timed_out) {
+      consoleStatus.textContent = "Timed out";
+
+      consoleOutput.innerHTML =
+        '<div class="console-error">Execution timed out.</div>';
+    } else {
+      consoleStatus.textContent = "Error";
+
+      const errorOutput = data.stderr || "Code execution failed.";
+
+      consoleOutput.innerHTML = `<div class="console-error">${escapeHtml(errorOutput)}</div>`;
+    }
+  } catch (error) {
+    console.error("Run error:", error);
+
+    consoleStatus.textContent = "Error";
+
+    consoleOutput.innerHTML = `<div class="console-error">${escapeHtml(
+      error.message || "Could not connect to the AI Coding Assistant API.",
+    )}</div>`;
+  } finally {
+    runButton.disabled = false;
+    runButton.textContent = "▶ Run Code";
+  }
+}
+
+/*
  * Basic HTML escaping
  *
  * This is important because API/AI
@@ -497,4 +574,81 @@ codeInput.addEventListener("keydown", function (event) {
   this.selectionEnd = newCursorPosition;
 
   updateLineCount();
+});
+
+/* F1 - Python editor line numbers */
+
+const lineNumbers = document.getElementById("lineNumbers");
+
+function updateLineNumbers() {
+  const lines = codeInput.value.split("\n").length;
+
+  lineNumbers.innerHTML = Array.from(
+    { length: lines },
+    (_, index) => `<div>${index + 1}</div>`,
+  ).join("");
+
+  lineNumbers.scrollTop = codeInput.scrollTop;
+}
+
+codeInput.addEventListener("input", updateLineNumbers);
+
+codeInput.addEventListener("scroll", function () {
+  lineNumbers.scrollTop = codeInput.scrollTop;
+});
+
+updateLineNumbers();
+
+/* F1 - Python indentation controls */
+
+codeInput.addEventListener("keydown", function (event) {
+  if (event.key !== "Tab") {
+    return;
+  }
+
+  event.preventDefault();
+
+  const start = this.selectionStart;
+  const end = this.selectionEnd;
+  const value = this.value;
+
+  if (event.shiftKey) {
+    const lineStart = value.lastIndexOf("\n", start - 1) + 1;
+    const lineText = value.slice(lineStart, start);
+
+    if (lineText.startsWith("    ")) {
+      this.value = value.slice(0, lineStart) + value.slice(lineStart + 4);
+
+      this.selectionStart = Math.max(start - 4, lineStart);
+      this.selectionEnd = Math.max(end - 4, lineStart);
+    } else if (lineText.startsWith(" ")) {
+      const removeCount = Math.min(4, lineText.match(/^ */)[0].length);
+
+      this.value =
+        value.slice(0, lineStart) + value.slice(lineStart + removeCount);
+
+      this.selectionStart = Math.max(start - removeCount, lineStart);
+      this.selectionEnd = Math.max(end - removeCount, lineStart);
+    }
+
+    updateLineCount();
+    updateLineNumbers();
+    return;
+  }
+
+  this.value = value.slice(0, start) + "    " + value.slice(end);
+
+  this.selectionStart = start + 4;
+  this.selectionEnd = start + 4;
+
+  updateLineCount();
+  updateLineNumbers();
+});
+
+/* F1 - Refresh line numbers after Python Enter handling */
+
+codeInput.addEventListener("keyup", function (event) {
+  if (event.key === "Enter") {
+    updateLineNumbers();
+  }
 });
