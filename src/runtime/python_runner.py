@@ -71,6 +71,7 @@ def run_python_code(code: str, timeout: int = 3):
                     "stdout": "",
                     "stderr": "Code execution sandbox is currently unavailable.",
                     "timed_out": False,
+                    "infrastructure_error": False,
                 }
 
             return {
@@ -79,6 +80,7 @@ def run_python_code(code: str, timeout: int = 3):
                 "stdout": result.stdout,
                 "stderr": result.stderr,
                 "timed_out": False,
+                "infrastructure_error": False,
             }
 
         except subprocess.TimeoutExpired:
@@ -88,6 +90,7 @@ def run_python_code(code: str, timeout: int = 3):
                 "stdout": "",
                 "stderr": "Execution timed out.",
                 "timed_out": True,
+                "infrastructure_error": False,
             }
 
         except FileNotFoundError:
@@ -97,4 +100,5 @@ def run_python_code(code: str, timeout: int = 3):
                 "stdout": "",
                 "stderr": "Docker is not available.",
                 "timed_out": False,
+                "infrastructure_error": True,
             }

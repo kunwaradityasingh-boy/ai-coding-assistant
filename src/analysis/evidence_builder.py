@@ -4,6 +4,7 @@ from src.runtime.error_parser import parse_runtime_error
 from src.schemas.evidence import CodeEvidence
 from src.runtime.python_runner import run_python_code
 
+
 def build_code_evidence(code: str) -> CodeEvidence:
     parse_result = parse_python_code(code)
 
@@ -13,17 +14,23 @@ def build_code_evidence(code: str) -> CodeEvidence:
 
         runtime_error = None
 
-        runtime_error = None
         if runtime_result["timed_out"]:
             runtime_error = {
                 "type": "ExecutionTimeout",
                 "message": "Execution timed out.",
                 "line": None,
             }
+
+        elif runtime_result.get("infrastructure_error", False):
+            runtime_error = {
+                "type": "SandboxUnavailable",
+                "message": runtime_result["stderr"],
+                "line": None,
+            }
+
         elif not runtime_result["success"]:
-            runtime_error = parse_runtime_error(
-                runtime_result["stderr"]
-            )
+            runtime_error = parse_runtime_error(runtime_result["stderr"])
+
         return CodeEvidence(
             syntax_valid=True,
             ast_tree=parse_result["tree"],
