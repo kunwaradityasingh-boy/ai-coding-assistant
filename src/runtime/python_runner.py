@@ -2,10 +2,8 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-
 DOCKER_IMAGE = (
-    "python@sha256:"
-    "cd04730b8511def3fbf14204d66a0c1536f290b8e896ed5a94cd64cb15ac1356"
+    "python@sha256:" "cd04730b8511def3fbf14204d66a0c1536f290b8e896ed5a94cd64cb15ac1356"
 )
 
 
@@ -17,10 +15,7 @@ def _is_docker_infrastructure_error(stderr: str) -> bool:
         "error during connect",
     ]
 
-    return any(
-        marker.lower() in stderr.lower()
-        for marker in infrastructure_markers
-    )
+    return any(marker.lower() in stderr.lower() for marker in infrastructure_markers)
 
 
 def run_python_code(code: str, timeout: int = 3):
@@ -69,9 +64,9 @@ def run_python_code(code: str, timeout: int = 3):
                     "success": False,
                     "return_code": None,
                     "stdout": "",
-                    "stderr": "Code execution sandbox is currently unavailable.",
+                    "stderr": ("Code execution sandbox is currently unavailable."),
                     "timed_out": False,
-                    "infrastructure_error": False,
+                    "infrastructure_error": True,
                 }
 
             return {

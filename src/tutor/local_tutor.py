@@ -50,10 +50,7 @@ class LocalTutor(Tutor):
                     hints=[
                         "Look at the value of the divisor.",
                         "What happens when the divisor is 0?",
-                        (
-                            "Can you check the divisor before "
-                            "performing division?"
-                        ),
+                        ("Can you check the divisor before " "performing division?"),
                     ],
                     concept="Division by zero",
                     next_step=(
@@ -63,9 +60,7 @@ class LocalTutor(Tutor):
                 )
 
             return TutorResult(
-                explanation=(
-                    f"The program produced {error_type}: {message}."
-                ),
+                explanation=(f"The program produced {error_type}: {message}."),
                 hints=[
                     "Look at the reported line.",
                     "Identify which operation caused the error.",
@@ -75,39 +70,27 @@ class LocalTutor(Tutor):
                     ),
                 ],
                 concept=error_type,
-                next_step=(
-                    "Try correcting the cause of the runtime error."
-                ),
+                next_step=("Try correcting the cause of the runtime error."),
             )
 
         if not evidence.syntax_valid:
-            error = evidence.syntax_error or {}
-
             return TutorResult(
-                explanation=(
-                    "Python could not understand the structure of the code."
-                ),
+                explanation=("Python could not understand the structure of the code."),
                 hints=[
                     "Look at the reported line.",
                     "Check brackets, indentation, and punctuation.",
                     "Compare the line with normal Python syntax.",
                 ],
                 concept="Python syntax",
-                next_step=(
-                    "Correct the syntax and run the code again."
-                ),
+                next_step=("Correct the syntax and run the code again."),
             )
 
         return TutorResult(
-            explanation=(
-                "No runtime or syntax problem was detected."
-            ),
+            explanation=("No runtime or syntax problem was detected."),
             hints=[
                 "Review the code logic step by step.",
                 "Check whether the output matches your expectation.",
             ],
             concept="Code reasoning",
-            next_step=(
-                "Test the program with different inputs."
-            ),
+            next_step=("Test the program with different inputs."),
         )
