@@ -34,6 +34,49 @@ const verificationSection = document.getElementById("verificationSection");
 
 const lineCount = document.getElementById("lineCount");
 
+let activeIssueLine = null;
+
+function focusEditorLine(line) {
+  const targetLine = Number(line);
+
+  if (!Number.isInteger(targetLine) || targetLine < 1) {
+    return;
+  }
+
+  const lines = codeInput.value.split("\n");
+
+  if (targetLine > lines.length) {
+    return;
+  }
+
+  const start = lines
+    .slice(0, targetLine - 1)
+    .reduce(
+      (position, currentLine) => position + currentLine.length + 1,
+      0,
+    );
+
+  const end = start + lines[targetLine - 1].length;
+
+  codeInput.focus();
+  codeInput.setSelectionRange(start, end);
+
+  const lineHeight = parseFloat(
+    window.getComputedStyle(codeInput).lineHeight,
+  );
+
+  if (Number.isFinite(lineHeight)) {
+    codeInput.scrollTop = Math.max(
+      0,
+      (targetLine - 1) * lineHeight - 90,
+    );
+  }
+
+  activeIssueLine = targetLine;
+  updateLineNumbers();
+}
+
+
 /*
  * Update line counter
  */
@@ -84,6 +127,29 @@ function renderIssues(issues) {
     const severity = (issue.severity || "warning").toLowerCase();
 
     div.className = `issue ${severity}`;
+
+    const issueLine = Number(issue.line);
+
+    if (Number.isInteger(issueLine) && issueLine > 0) {
+      div.classList.add("issue-clickable");
+      div.tabIndex = 0;
+      div.setAttribute(
+        "aria-label",
+        `Go to line ${issueLine}: ${issue.message || "Issue"}`,
+      );
+
+      const goToIssueLine = () => focusEditorLine(issueLine);
+
+      div.addEventListener("click", goToIssueLine);
+
+      div.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          goToIssueLine();
+        }
+      });
+    }
+
 
     div.innerHTML = `
 
@@ -585,7 +651,16 @@ function updateLineNumbers() {
 
   lineNumbers.innerHTML = Array.from(
     { length: lines },
-    (_, index) => `<div>${index + 1}</div>`,
+
+    (_, index) => {
+      const lineNumber = index + 1;
+
+      const activeClass =
+        lineNumber === activeIssueLine ? " active-issue-line" : "";
+
+      return `<div class="${activeClass.trim()}">${lineNumber}</div>`;
+    },
+
   ).join("");
 
   lineNumbers.scrollTop = codeInput.scrollTop;

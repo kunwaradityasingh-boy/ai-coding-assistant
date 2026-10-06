@@ -875,3 +875,32 @@ footer {
 .console-info {
   color: #93c5fd;
 }
+
+
+/* B.1 - Diagnostic issue navigation */
+
+.issue-clickable {
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.issue-clickable:hover,
+.issue-clickable:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+.line-numbers div {
+  min-height: 23.8px;
+  border-radius: 4px;
+}
+
+.line-numbers div.active-issue-line {
+  background: #7f1d1d;
+  color: #fecaca;
+  font-weight: 700;
+}
